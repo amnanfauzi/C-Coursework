@@ -102,6 +102,30 @@ class ColonyShip : public Ship {
 			}
 		};
 
+		ColonyShip(string theName) {
+			if (theName == "Ferry") { // Ferry
+				name = "Ferry";
+				colonistNum = 100;
+				cost = 500;
+				weight = 10;
+				energyConsumption = 5;
+			}
+			else if (theName == "Liner") { //Liner
+				name = "Liner";
+				colonistNum = 250;
+				cost = 1000;
+				weight = 20;
+				energyConsumption = 7;
+			}
+			else { //Cloud
+				name = "Cloud";
+				colonistNum = 750;
+				cost = 2000;
+				weight = 30;
+				energyConsumption = 9;
+			}
+		};
+
 		// Returns nr of  colonists of a ship
 		int getColonistCount() const {
 			return colonistNum;
@@ -150,6 +174,23 @@ class SolarSailShip : public Ship {
 			}
 		};
 
+		SolarSailShip(string theName) {
+			if (theName == "Radiant") {
+				name = "Radiant";
+				energyProduction = 50;
+				cost = 50;
+				weight = 3;
+				energyConsumption = 5;
+			}
+			else {
+				name = "Ebulient";
+				energyProduction = 500;
+				cost = 250;
+				weight = 50;
+				energyConsumption = 5;
+			}
+		};
+
 		// Returns energy  production of Solar Sail Ship   
 		int getEnergyProduction () const {
 			return energyProduction;
@@ -164,6 +205,30 @@ class MilitaryEscortShip : public Ship {
 public:
 
 	// Creating the appropriate military ship
+	MilitaryEscortShip(string theName) {
+		if (theName == "Cruiser") { //Cruiser
+			name = "Cruiser";
+			cost = 300;
+			weight = 2;
+			energyConsumption = 10;
+			nrProtected = 1;
+		} 
+		else if (theName == "Frigate") { //Frigate
+			name = "Frigate";
+			cost = 1000;
+			weight = 7;
+			energyConsumption = 20;
+			nrProtected = 6; 
+		}
+		else { //Destroyer
+			name = "Destroyer";
+			cost = 2000;
+			weight = 19;
+			energyConsumption = 30;
+			nrProtected = 12;
+		}
+	};
+
 	MilitaryEscortShip(int num) {
 		if (num == 1) { //Cruiser
 			name = "Cruiser";
@@ -171,13 +236,13 @@ public:
 			weight = 2;
 			energyConsumption = 10;
 			nrProtected = 1;
-		} 
+		}
 		else if (num == 2) { //Frigate
 			name = "Frigate";
 			cost = 1000;
 			weight = 7;
 			energyConsumption = 20;
-			nrProtected = 6; 
+			nrProtected = 6;
 		}
 		else { //Destroyer
 			name = "Destroyer";
@@ -782,4 +847,56 @@ void startRace(Fleet* theFleet) {
 
 bool sortFleetSpeed(Fleet * fleet1, Fleet * fleet2) {
 	return fleet1->getFleetSpeed() > fleet2->getFleetSpeed();
+}
+
+// Read user's fleet from file
+Fleet* readFleetFromFile(string userName) {
+
+	bool solarPresence = false;
+	string name;
+	int num, money = 0;
+	Fleet* newFleet = new Fleet(userName);
+	ifstream theFile("023493-fleet.dat");
+	
+	// Read ships from file
+	if (theFile.is_open())
+	{
+		while (theFile >> name >> num)
+		{
+			for (int x = 0; x < num; x++) {
+				if (name == "Ferry" || name == "Liner" || name == "Cloud") {
+					ColonyShip *newColony = new ColonyShip(name);
+					newFleet->addToFleet(newColony);
+					money += newColony->getCost();
+				}
+				else if (name == "Ebulient" || name == "Radiant") {
+					SolarSailShip *newSolarSail = new SolarSailShip(name);
+					newFleet->addToFleet(newSolarSail);
+					money += newSolarSail->getCost();
+					solarPresence = true;
+				}
+				else if (name == "Cruiser" || name == "Frigate" || name == "Destroyer") {
+					MilitaryEscortShip *newMilitaryShip = new MilitaryEscortShip(name);
+					newFleet->addToFleet(newMilitaryShip);
+					money += newMilitaryShip->getCost();
+				}
+				else {
+					Ship *medicShip = new Ship("Medic", 1, 1000, 1);
+					newFleet->addToFleet(medicShip);
+					money += 1000;
+				}
+			}
+		}
+		theFile.close();
+	}
+	else {
+		cout << "Unable to open file";
+		return NULL;
+	}
+
+	// Check whether user composed a complete fleet or not
+	if (money > 10000 || newFleet->getEnergyConsumption() > newFleet->EnergyProduction() || solarPresence == false) {
+		newFleet = NULL;
+	}
+		return newFleet;
 }

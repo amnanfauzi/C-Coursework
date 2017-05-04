@@ -9,15 +9,19 @@ int main()
 {
 
 	int gameAnswer = 1;
+	char dummy;
+	string userName;
 	while (gameAnswer != 2) {
 
 		vector<Fleet *> fleetList;
 		int createAnswer = 1;
-		cout << "Welcome to the race to conquer Gaia! " << endl
-			<< "Please compose a fleet " << endl << endl;
+		cout << "Welcome to the race to conquer Gaia! " << endl;
+		cout << "Enter your name: ";
+		cin >> userName;
+		cout << endl << "Please compose a fleet for the competition" << endl << endl;
 
-		ofstream theFile;
-		theFile.open("023493-fleet.dat");
+		//ofstream theFile;
+		//theFile.open("023493-fleet.dat");
 
 		string tempShipName;
 		int count = 0;
@@ -28,18 +32,18 @@ int main()
 			// Debugging - Output the fleet that is constructed
 			vector<Ship *> theShips = theFleet->shipList();
 
-			cout << "Your fleet: " << endl;
+			cout << "Fleet created " << endl;
 			cout << "Corporation Name: " << theFleet->getCorporationName() << endl << endl;
 
 			cout << "Ships in fleet: " << endl;
 
-			theFile << theFleet->getCorporationName() << endl;
+			//theFile << theFleet->getCorporationName() << endl;
 
 			tempShipName = theShips[0]->getTypeName();
 
 			for (int x = 0; x < theShips.size(); x++) {
 				cout << theShips[x]->getTypeName() << " ship " << endl;
-
+				/*
 				if (theShips[x]->getTypeName() == tempShipName) {
 					count++;
 					if (x == (theShips.size() - 1)) {
@@ -52,9 +56,8 @@ int main()
 					tempShipName = theShips[x]->getTypeName();
 					count = 1;
 				}
+				*/
 			}
-
-			
 
 			cout << "Fleet weight: " << theFleet->getWeight() << endl;
 			cout << "Colonist count: " << theFleet->getColonistCount() << endl;
@@ -69,17 +72,44 @@ int main()
 			cin >> createAnswer;
 		}
 
-		theFile.close();
+		//theFile.close();
+
+		Fleet* userFleet = readFleetFromFile(userName);
+
+		if (userFleet == NULL) {
+			cout << "Cannot create your fleet because: "
+				<< "1) Cannot open file to read your fleet OR"
+				<< "2) Your fleet did not meet the requirements to enter the race"
+				<< endl << endl;			
+		}
+		else {
+			fleetList.push_back(userFleet);
+			cout << endl << "This is your fleet" << endl << endl;
+			vector<Ship *> theShips = userFleet->shipList();
+
+			cout << "Corporation Name: " << userFleet->getCorporationName() << endl << endl;
+
+			cout << "Ships in fleet: " << endl;
+
+			tempShipName = theShips[0]->getTypeName();
+
+			for (int x = 0; x < theShips.size(); x++) {
+				cout << theShips[x]->getTypeName() << " ship " << endl;
+			}
+		}
 
 		// Sort the vector of fleet based on fleet speed
 		sort(fleetList.begin(), fleetList.end(), sortFleetSpeed);
 
 		// Debugging - Output contents of vector
 
-		cout << "Fleets that will be racing to Gaia: " << endl;
+		cout << endl << endl << "Fleets that will be racing to Gaia: " << endl;
 		for (int a = 0; a < fleetList.size(); a++) {
 			cout << fleetList[a]->getCorporationName() << " Corporation"<< endl;
 		}
+
+		cout << "Press 1 to begin race....";
+		cin >> dummy;
 
 		// Begin the race for all fleets
 		cout << endl << endl << "Let the race to conquer Gaia begin!" << endl << endl;
